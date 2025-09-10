@@ -1,0 +1,373 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Agenda de Jobs — Calendário</title>
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --card:#fff;
+    --muted:#6b7280;
+    --accent-start:#0ea5e9;
+    --accent-end:#2563eb;
+    --radius:14px;
+    --shadow:0 10px 30px rgba(12,17,26,0.08);
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial}
+  body{background:var(--bg);display:flex;align-items:flex-start;justify-content:center;padding:36px}
+  .wrap{width:100%;max-width:1100px}
+  header{display:flex;align-items:center;gap:16px;margin-bottom:18px}
+  .logo{width:56px;height:56px;border-radius:12px;background:linear-gradient(135deg,var(--accent-start),var(--accent-end));display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700}
+  h1{margin:0;font-size:20px}
+  p.lead{margin:2px 0 0;color:var(--muted);font-size:13px}
+
+  .card{background:var(--card);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px;display:grid;grid-template-columns:1fr 360px;gap:18px}
+  .calendar-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+  .nav{display:flex;gap:8px;align-items:center}
+  .btn{background:linear-gradient(90deg,var(--accent-start),var(--accent-end));color:#fff;padding:8px 12px;border-radius:10px;border:0;cursor:pointer;font-weight:600}
+  .month-title{font-weight:700;font-size:18px}
+  .grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+  .weekday{font-size:12px;color:var(--muted);text-align:center;padding:8px 0}
+  .day{
+    min-height:96px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(250,250,250,0.9));
+    border-radius:10px;padding:8px;position:relative;overflow:hidden;border:1px solid rgba(15,23,42,0.03);
+  }
+  .day.other{opacity:0.35}
+  .day .num{position:absolute;top:8px;left:8px;font-weight:700}
+  .markers{position:absolute;right:8px;top:8px;display:flex;gap:6px;align-items:center}
+  .dot{width:10px;height:10px;border-radius:999px;background:linear-gradient(90deg,var(--accent-start),var(--accent-end))}
+  .count{background:rgba(15,23,42,0.06);padding:4px 8px;border-radius:10px;font-size:12px;color:var(--muted)}
+  .day .list{position:absolute;left:8px;bottom:8px;right:8px;display:flex;flex-direction:column;gap:6px}
+  .item{
+    background:linear-gradient(180deg,rgba(14,165,233,0.08),rgba(37,99,235,0.06));
+    padding:6px 8px;border-radius:8px;font-size:12px;display:flex;justify-content:space-between;align-items:center;gap:8px;
+  }
+  aside{padding:12px;background:linear-gradient(180deg,rgba(255,255,255,0.9),rgba(250,250,250,0.9));border-radius:12px}
+  h3{margin:0 0 8px}
+  form label{display:block;margin-top:10px;font-weight:600;font-size:13px}
+  input[type="text"], input[type="time"], input[type="date"], select, textarea{width:100%;padding:8px;border-radius:8px;border:1px solid #e6eef7;font-size:14px;margin-top:6px}
+  textarea{resize:vertical;min-height:80px}
+  .small{font-size:13px;color:var(--muted);margin-top:8px}
+  .actions{display:flex;gap:10px;margin-top:12px}
+  .ghost{background:transparent;border:1px solid rgba(0,0,0,0.06);padding:8px 12px;border-radius:8px;cursor:pointer}
+  .list-schedules{max-height:420px;overflow:auto;margin-top:10px;display:flex;flex-direction:column;gap:8px}
+  .sched-row{padding:10px;border-radius:8px;background:linear-gradient(180deg,rgba(250,250,250,0.8),rgba(255,255,255,0.95));border:1px solid rgba(0,0,0,0.04);display:flex;justify-content:space-between;align-items:center}
+  .muted{color:var(--muted);font-size:13px}
+  footer{margin-top:12px;color:var(--muted);font-size:13px}
+  @media (max-width:980px){.card{grid-template-columns:1fr}.aside-hidden{display:none}}
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="logo">GCD</div>
+      <div>
+        <h1>Agenda de Execução — Jobs</h1>
+        <p class="lead">Marque dias e horários de execução dos jobs (estilo Control+M).</p>
+      </div>
+    </header>
+
+    <div class="card" role="application" aria-label="Calendário de Jobs">
+      <main>
+        <div class="calendar-header">
+          <div class="nav">
+            <button id="prev" class="ghost">◀</button>
+            <div class="month-title" id="monthTitle">—</div>
+            <button id="next" class="ghost">▶</button>
+          </div>
+          <div>
+            <button id="todayBtn" class="btn">Hoje</button>
+          </div>
+        </div>
+
+        <div class="grid" id="weekdays"></div>
+        <div class="grid" id="daysGrid" aria-live="polite"></div>
+      </main>
+
+      <aside class="aside-hidden" id="aside">
+        <h3 id="asideTitle">Agendar execução</h3>
+
+        <form id="schedForm" autocomplete="off">
+          <input type="hidden" id="schedId">
+          <label for="jobName">Job</label>
+          <input id="jobName" required placeholder="Ex: JOB_CALCULO_DESPESA_2DI34212.kjb">
+
+          <label for="dateField">Data</label>
+          <input id="dateField" type="date" required>
+
+          <label for="timeStart">Horário início</label>
+          <input id="timeStart" type="time" required>
+
+          <label for="timeEnd">Horário fim (opcional)</label>
+          <input id="timeEnd" type="time">
+
+          <label for="notes">Observações</label>
+          <textarea id="notes" placeholder="Comandos, path ou observações"></textarea>
+
+          <div class="actions">
+            <button type="submit" class="btn">Salvar</button>
+            <button type="button" id="clearBtn" class="ghost">Limpar</button>
+            <button type="button" id="deleteBtn" class="ghost" style="color:#c33">Excluir</button>
+          </div>
+        </form>
+
+        <div class="small">Salvar localmente no navegador. Você também pode enviar todas as marcações para um backend (API).</div>
+        <div style="height:12px"></div>
+
+        <h4>Agendamentos</h4>
+        <div class="list-schedules" id="listSchedules" aria-live="polite"></div>
+
+        <div style="height:12px"></div>
+        <button id="exportBtn" class="ghost">Exportar JSON</button>
+        <button id="pushBtn" class="btn">Enviar para API</button>
+
+        <footer>
+          <div class="muted">Formato POST esperado: POST /api/schedules { schedules: [...] }</div>
+        </footer>
+      </aside>
+    </div>
+  </div>
+
+<script>
+/*
+  Calendar + scheduling logic
+  - stores schedules in localStorage under key "gcd_schedules"
+  - optional POST to /api/schedules (array of schedule objects)
+  - schedule object:
+    { id, job, date (YYYY-MM-DD), start (HH:MM), end (HH:MM|null), notes, created_at }
+*/
+
+// util
+const uid = () => 's_' + Math.random().toString(36).slice(2,9);
+const fmtDate = d => d.toISOString().slice(0,10);
+
+// state
+let view = { year: new Date().getFullYear(), month: new Date().getMonth() }; // 0-based month
+let schedules = JSON.parse(localStorage.getItem('gcd_schedules')||'[]');
+
+const weekdays = ['Dom','Seg','Ter','Qua','Qui','Sex','Sáb'];
+const weekdaysEl = document.getElementById('weekdays');
+weekdays.forEach(w=>{
+  const el = document.createElement('div');
+  el.className='weekday'; el.textContent=w; weekdaysEl.appendChild(el);
+});
+
+const monthTitle = document.getElementById('monthTitle');
+const daysGrid = document.getElementById('daysGrid');
+const aside = document.getElementById('aside');
+const schedForm = document.getElementById('schedForm');
+const listSchedules = document.getElementById('listSchedules');
+
+// render calendar
+function render(){
+  daysGrid.innerHTML='';
+  const year = view.year, month = view.month;
+  const first = new Date(year, month, 1);
+  const last = new Date(year, month+1, 0);
+  const startDayOfWeek = first.getDay(); // 0..6
+  const totalDays = last.getDate();
+  // previous month tail
+  const prevLast = new Date(year, month, 0).getDate();
+  monthTitle.textContent = first.toLocaleString('pt-BR',{month:'long', year:'numeric'});
+  // render 6x7 grid to keep consistent height
+  const totalCells = 42;
+  for(let i=0;i<totalCells;i++){
+    const cell = document.createElement('div');
+    cell.className='day';
+    // compute date for this cell
+    const cellIndex = i - startDayOfWeek + 1;
+    let cellDate;
+    if(cellIndex <= 0){
+      // prev month
+      const dayNum = prevLast + cellIndex;
+      cell.classList.add('other');
+      cellDate = new Date(year, month-1, dayNum);
+    } else if(cellIndex > totalDays){
+      // next month
+      const dayNum = cellIndex - totalDays;
+      cell.classList.add('other');
+      cellDate = new Date(year, month+1, dayNum);
+    } else {
+      const dayNum = cellIndex;
+      cellDate = new Date(year, month, dayNum);
+    }
+    const iso = fmtDate(cellDate);
+    const num = document.createElement('div'); num.className='num'; num.textContent = cellDate.getDate();
+    cell.appendChild(num);
+
+    // markers
+    const dayScheds = schedules.filter(s => s.date === iso);
+    if(dayScheds.length){
+      const markers = document.createElement('div'); markers.className='markers';
+      const dot = document.createElement('div'); dot.className='dot';
+      const count = document.createElement('div'); count.className='count'; count.textContent = dayScheds.length;
+      markers.appendChild(dot); markers.appendChild(count);
+      cell.appendChild(markers);
+
+      const list = document.createElement('div'); list.className='list';
+      dayScheds.slice(0,3).forEach(s=>{
+        const it = document.createElement('div'); it.className='item';
+        it.innerHTML = `<div style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${s.timeRange|| (s.start)}</div>
+                        <div style="opacity:.85;font-weight:700">${s.job}</div>`;
+        it.title = s.notes||'';
+        list.appendChild(it);
+      });
+      cell.appendChild(list);
+    }
+
+    // clicking a day opens aside to create new schedule on that date
+    cell.addEventListener('click', (e)=>{
+      openAsideForDate(iso);
+    });
+
+    daysGrid.appendChild(cell);
+  }
+}
+
+// aside logic
+function openAsideForDate(iso){
+  aside.scrollIntoView({behavior:'smooth'});
+  document.getElementById('schedId').value = '';
+  document.getElementById('jobName').value = '';
+  document.getElementById('dateField').value = iso;
+  document.getElementById('timeStart').value = '';
+  document.getElementById('timeEnd').value = '';
+  document.getElementById('notes').value = '';
+  document.getElementById('deleteBtn').style.display='none';
+  refreshList();
+}
+
+function refreshList(){
+  listSchedules.innerHTML='';
+  const sorted = schedules.slice().sort((a,b)=> a.date.localeCompare(b.date) || a.start.localeCompare(b.start));
+  if(!sorted.length){
+    listSchedules.innerHTML = '<div class="muted">Nenhum agendamento</div>';
+    return;
+  }
+  sorted.forEach(s=>{
+    const row = document.createElement('div'); row.className='sched-row';
+    const left = document.createElement('div');
+    left.innerHTML = `<div style="font-weight:700">${s.job}</div><div class="muted">${s.date} • ${s.start}${s.end? ' - ' + s.end : ''}</div>`;
+    const right = document.createElement('div');
+    const editBtn = document.createElement('button'); editBtn.className='ghost'; editBtn.textContent='Editar';
+    editBtn.addEventListener('click', ()=> loadToForm(s.id));
+    const delBtn = document.createElement('button'); delBtn.className='ghost'; delBtn.style.color='#c33'; delBtn.textContent='Excluir';
+    delBtn.addEventListener('click', ()=> { if(confirm('Excluir este agendamento?')){ deleteSchedule(s.id); }});
+    right.appendChild(editBtn); right.appendChild(delBtn);
+    row.appendChild(left); row.appendChild(right);
+    listSchedules.appendChild(row);
+  });
+}
+
+function loadToForm(id){
+  const s = schedules.find(x=>x.id===id); if(!s) return;
+  document.getElementById('schedId').value = s.id;
+  document.getElementById('jobName').value = s.job;
+  document.getElementById('dateField').value = s.date;
+  document.getElementById('timeStart').value = s.start;
+  document.getElementById('timeEnd').value = s.end||'';
+  document.getElementById('notes').value = s.notes||'';
+  document.getElementById('deleteBtn').style.display='inline-block';
+  aside.scrollIntoView({behavior:'smooth'});
+}
+
+function saveToStorage(){
+  localStorage.setItem('gcd_schedules', JSON.stringify(schedules));
+  render(); refreshList();
+}
+
+function deleteSchedule(id){
+  schedules = schedules.filter(s=>s.id!==id);
+  saveToStorage();
+}
+
+// handle form submit
+schedForm.addEventListener('submit', (e)=>{
+  e.preventDefault();
+  const id = document.getElementById('schedId').value || uid();
+  const job = document.getElementById('jobName').value.trim();
+  const date = document.getElementById('dateField').value;
+  const start = document.getElementById('timeStart').value;
+  const end = document.getElementById('timeEnd').value || null;
+  const notes = document.getElementById('notes').value.trim();
+  if(!job || !date || !start){ alert('Preencha job, data e horário de início.'); return; }
+  const existing = schedules.find(s=>s.id === id);
+  const item = { id, job, date, start, end, notes, created_at: new Date().toISOString() };
+  item.timeRange = end ? (start + ' - ' + end) : start;
+  if(existing){
+    Object.assign(existing, item);
+  } else {
+    schedules.push(item);
+  }
+  saveToStorage();
+  // clear form id (keeps values)
+  document.getElementById('schedId').value='';
+  document.getElementById('deleteBtn').style.display='none';
+});
+
+// clear button
+document.getElementById('clearBtn').addEventListener('click', ()=>{
+  schedForm.reset();
+  document.getElementById('schedId').value = '';
+  document.getElementById('deleteBtn').style.display='none';
+});
+
+// delete btn
+document.getElementById('deleteBtn').addEventListener('click', ()=>{
+  const id = document.getElementById('schedId').value;
+  if(!id) return;
+  if(confirm('Excluir este agendamento?')) deleteSchedule(id);
+});
+
+// calendar nav
+document.getElementById('prev').addEventListener('click', ()=>{
+  if(view.month === 0){ view.month = 11; view.year -=1; } else view.month -=1; render();
+});
+document.getElementById('next').addEventListener('click', ()=>{
+  if(view.month === 11){ view.month = 0; view.year +=1; } else view.month +=1; render();
+});
+document.getElementById('todayBtn').addEventListener('click', ()=>{
+  const now = new Date(); view.year = now.getFullYear(); view.month = now.getMonth(); render();
+});
+
+// export JSON
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(schedules, null, 2));
+  const a = document.createElement('a'); a.href = dataStr; a.download = 'schedules.json'; a.click();
+});
+
+// push to API
+document.getElementById('pushBtn').addEventListener('click', async ()=>{
+  if(!confirm('Enviar todos os agendamentos para /api/schedules ?')) return;
+  try {
+    const res = await fetch('/api/schedules', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ schedules })
+    });
+    if(res.ok){
+      alert('Enviado com sucesso.');
+    } else {
+      const text = await res.text();
+      alert('Erro ao enviar: ' + (text || res.status));
+    }
+  } catch (err){
+    alert('Falha na requisição: ' + err.message);
+  }
+});
+
+// keyboard shortcut Ctrl+M / Cmd+M to open form for today
+window.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey || e.metaKey) && e.key.toLowerCase()==='m'){
+    e.preventDefault();
+    openAsideForDate(fmtDate(new Date()));
+  }
+});
+
+// initial render
+render(); refreshList();
+</script>
+</body>
+</html>
