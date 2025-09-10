@@ -2,181 +2,68 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>Release — GCD Plano (Preview)</title>
+  <title>Novo Release</title>
   <style>
-    :root{
-      --bg:#f5f7fa;
-      --card:#ffffff;
-      --muted:#6b7280;
-      --accent: linear-gradient(135deg,#0f172a66,#0ea5e966);
-      --glass: rgba(255,255,255,0.6);
-      --radius:16px;
-      --shadow: 0 8px 30px rgba(12, 17, 26, 0.08);
+    body {
+      margin:0; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
+      background:#f5f7fa; display:flex; justify-content:center; padding:40px;
     }
-    html,body{height:100%;}
-    body{
-      margin:0;font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial; background:var(--bg);
-      -webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale; display:flex; align-items:center; justify-content:center; padding:48px;
+    .card {
+      background:#fff; border-radius:16px; box-shadow:0 8px 30px rgba(0,0,0,.1);
+      max-width:600px; width:100%; padding:30px;
     }
-    .container{width:100%; max-width:980px}
-    .card{background:var(--card); border-radius:var(--radius); box-shadow:var(--shadow); padding:28px; display:grid; grid-template-columns:1fr 360px; gap:20px; align-items:start}
-    .header{display:flex; align-items:center; gap:16px}
-    .logo{width:64px; height:64px; border-radius:12px; background:linear-gradient(135deg,#111827,#0ea5e9); display:flex; align-items:center; justify-content:center; color:#fff; font-weight:700}
-    h1{margin:0; font-size:20px}
-    p.lead{margin:6px 0 0;color:var(--muted)}
-    .meta{margin-top:18px; display:flex; gap:12px; flex-wrap:wrap}
-    .meta .pill{background:var(--glass); padding:8px 12px; border-radius:999px; font-size:13px; color:var(--muted); backdrop-filter:blur(6px)}
-    .section{background:transparent}
-    .box{padding:16px;border-radius:12px;background:linear-gradient(180deg, rgba(250,250,250,0.6), rgba(255,255,255,0.4)); box-shadow:inset 0 1px 0 rgba(255,255,255,0.6)}
-    .list{margin:0;padding:0; list-style:none}
-    .list li{padding:10px 0;border-bottom:1px solid #eef2f6}
-    .list li:last-child{border-bottom:0}
-    .muted{color:var(--muted);font-size:13px}
-    .right .box{position:sticky; top:28px}
-    .btn{display:inline-block;padding:10px 14px;border-radius:10px;background:linear-gradient(90deg,#0ea5e9,#2563eb); color:#fff; text-decoration:none; font-weight:600}
-    pre.sql{background:#0b1220;color:#e6eef7;padding:14px;border-radius:10px;overflow:auto;font-size:13px}
-    footer{margin-top:18px;color:var(--muted);font-size:13px}
-    @media (max-width:880px){.card{grid-template-columns:1fr;}.right{order:2}}
+    h1 { margin:0 0 20px; font-size:24px; }
+    label { display:block; margin:10px 0 5px; font-weight:500; }
+    input, textarea {
+      width:100%; padding:10px; border:1px solid #ddd; border-radius:10px;
+      font-size:15px;
+    }
+    button {
+      margin-top:20px; padding:12px 20px; border:none; border-radius:12px;
+      background:linear-gradient(90deg,#0ea5e9,#2563eb); color:#fff;
+      font-size:16px; font-weight:600; cursor:pointer;
+    }
+    button:hover { opacity:0.9; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="card">
-      <div>
-        <div class="header">
-          <div class="logo">GCD</div>
-          <div>
-            <h1>Plano de Release — MASTER</h1>
-            <p class="lead">Visão rápida do release, jobs e histórico. (fonte: documento de release)</p>
-            <div class="meta">
-              <div class="pill">Versão: 2.0</div>
-              <div class="pill">Data: 2025-09-02</div>
-              <div class="pill">Autor: Marcelo Jandre</div>
-            </div>
-          </div>
-        </div>
+  <div class="card">
+    <h1>Cadastrar Release</h1>
+    <form id="releaseForm">
+      <label for="name">Nome</label>
+      <input type="text" id="name" name="name" required>
 
-        <section class="section" style="margin-top:18px">
-          <div class="box">
-            <h3 style="margin:0 0 8px">Descrição</h3>
-            <p class="muted">Processo ETL no Pentaho que calcula o evento conciliado da MASTER com dados extraídos do DB2. Período de extração: "CURRENT DATE - 22 DAYS AND CURRENT DATE - 8 DAYS".</p>
-          </div>
-        </section>
+      <label for="version">Versão</label>
+      <input type="text" id="version" name="version">
 
-        <section class="section" style="margin-top:12px">
-          <div class="box">
-            <h3 style="margin:0 0 8px">Jobs / Referências</h3>
-            <ul class="list">
-              <li>
-                <strong>JOB_CALCULO_DESPESA_2DI34212.kjb</strong>
-                <div class="muted">Link: Master Semanal</div>
-              </li>
-              <li>
-                <strong>TRF_VARIAVEIS.ktr</strong>
-                <div class="muted">Link: Master Semanal</div>
-              </li>
-            </ul>
-          </div>
-        </section>
+      <label for="author">Autor</label>
+      <input type="text" id="author" name="author">
 
-        <section style="margin-top:12px">
-          <div class="box">
-            <h3 style="margin:0 0 8px">Erros conhecidos / Observações</h3>
-            <p class="muted">Disponibilidade de rede / DB2 / Agendador Windows / Bucket S3. Observação: extração com período muito próxima do fato (CURRENT DATE -7 .. -1) trouxe inconsistências.</p>
-          </div>
-        </section>
+      <label for="release_date">Data de Release</label>
+      <input type="date" id="release_date" name="release_date">
 
-        <footer>Documento de origem carregado. Referência: fileciteturn0file0</footer>
-      </div>
+      <label for="extraction_period">Período de Extração</label>
+      <input type="text" id="extraction_period" name="extraction_period">
 
-      <aside class="right">
-        <div class="box">
-          <h4 style="margin:0 0 8px">Ações</h4>
-          <a class="btn" href="#">Exportar SQL</a>
-          <div style="height:16px"></div>
-          <h4 style="margin:0 0 8px">Instalação</h4>
-          <p class="muted">Copiar arquivos Pentaho para <code>E:\GitHub\ourocard-etl\etl\DespesaBandeira\Master\2DI34212\</code></p>
-        </div>
+      <label for="description">Descrição</label>
+      <textarea id="description" name="description" rows="4"></textarea>
 
-        <div style="height:12px"></div>
-
-        <div class="box" aria-live="polite">
-          <h4 style="margin:0 0 8px">Esquema SQL (exemplo)</h4>
-          <pre class="sql">-- PostgreSQL schema (DDL) - created for document model
-CREATE TABLE releases (
-  id SERIAL PRIMARY KEY,
-  name TEXT NOT NULL,
-  version TEXT,
-  author TEXT,
-  description TEXT,
-  release_date DATE,
-  extraction_period TEXT,
-  created_at TIMESTAMPTZ DEFAULT now()
-);
-
-CREATE TABLE job_references (
-  id SERIAL PRIMARY KEY,
-  release_id INTEGER REFERENCES releases(id) ON DELETE CASCADE,
-  job_name TEXT NOT NULL,
-  job_path TEXT,
-  notes TEXT
-);
-
-CREATE TABLE dependencies (
-  id SERIAL PRIMARY KEY,
-  release_id INTEGER REFERENCES releases(id) ON DELETE CASCADE,
-  package_name TEXT NOT NULL,
-  vendor TEXT,
-  version TEXT,
-  notes TEXT
-);
-
-CREATE TABLE change_history (
-  id SERIAL PRIMARY KEY,
-  release_id INTEGER REFERENCES releases(id) ON DELETE CASCADE,
-  change_date DATE,
-  version TEXT,
-  responsible TEXT,
-  description TEXT
-);
-
-CREATE TABLE defects (
-  id SERIAL PRIMARY KEY,
-  release_id INTEGER REFERENCES releases(id) ON DELETE CASCADE,
-  title TEXT,
-  description TEXT,
-  status TEXT,
-  discovered_at DATE
-);
-
--- flexible place to store installation steps/config
-CREATE TABLE installation_steps (
-  id SERIAL PRIMARY KEY,
-  release_id INTEGER REFERENCES releases(id) ON DELETE CASCADE,
-  step_order INTEGER,
-  instruction TEXT
-);
-
--- example index
-CREATE INDEX idx_releases_version ON releases(version);
-
--- sample insert (from uploaded document)
-INSERT INTO releases (name, version, author, description, release_date, extraction_period)
-VALUES ('Cálculo de evento da MASTER', '2.0', 'Marcelo Jandre', 'ETL Pentaho que calcula o evento conciliado da MASTER com dados extraídos do DB2.', '2025-09-02', 'CURRENT DATE - 22 DAYS AND CURRENT DATE - 8 DAYS');
-
--- add job refs
-INSERT INTO job_references (release_id, job_name, job_path, notes)
-VALUES (1, 'JOB_CALCULO_DESPESA_2DI34212.kjb', 'Master Semanal', NULL),
-       (1, 'TRF_VARIAVEIS.ktr', 'Master Semanal', NULL);
-
--- installation instruction example
-INSERT INTO installation_steps (release_id, step_order, instruction)
-VALUES (1, 1, 'Copiar arquivos do Pentaho para E:\\GitHub\\ourocard-etl\\etl\\DespesaBandeira\\Master\\2DI34212\\ substituindo os já existentes.');
-</pre>
-        </div>
-      </aside>
-    </div>
+      <button type="submit">Salvar</button>
+    </form>
+    <p id="status"></p>
   </div>
+
+  <script>
+    document.getElementById('releaseForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const data = Object.fromEntries(new FormData(e.target));
+      const res = await fetch('/api/releases', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(data)
+      });
+      document.getElementById('status').innerText = res.ok ? '✅ Salvo com sucesso!' : '❌ Erro ao salvar';
+    });
+  </script>
 </body>
 </html>
