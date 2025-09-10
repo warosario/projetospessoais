@@ -30,8 +30,8 @@
   <div class="card">
     <h1>Cateno Gestão de Contas de Pagamento S.A.<br>Gerência de Ciência de Dados</h1>
     <br>
-    <br>
     <h1>Histórico de Revisão</h1>
+    <br>
     <form id="releaseForm">
 
       <label for="release_date">Data</label>
@@ -43,14 +43,38 @@
       <label for="name">Responsável</label>
       <input type="text" id="responsavel" name="responsavel" required>
 
-      <label for="description">Descrição</label>
+      <label for="description">Descrição da Alteração</label>
       <textarea id="descricao" name="descricao" rows="4"></textarea>
 
-      <label for="extraction_period">Período de Extração</label>
+    </form>
+    
+    <form id="releaseForm">
+      
+      <br>
+      <h1>1. Introdução</h1>
+      <br>      
+      <label for="description">Descrição</label>
+      <textarea id="intro_descricao" name="intro_escricao" rows="4"></textarea>
+      <h1>1.1 1.1	Referências</h1>
+      <label for="name">Título</label>
+      <input type="text" id="intro_titulo" name="intro_titulo" required>
+      
+      <label for="name">Descrição/Localização</label>
+      <input type="text" id="intro_descloca" name="intro_descloca" required>
+
+      
+    </form>
+    
+    
+    
+    <label for="extraction_period">Período de Extração</label>
       <input type="text" id="extraction_period" name="extraction_period">
 
+      
+
+
       <button type="submit">Salvar</button>
-    </form>
+
     <p id="status"></p>
   </div>
 
