@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
   <meta charset="utf-8">
-  <title>Novo Release</title>
+  <title>Plano_Releases</title>
   <style>
     body {
       margin:0; font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto;
@@ -29,24 +29,25 @@
 <body>
   <div class="card">
     <h1>Cateno Gestão de Contas de Pagamento S.A.<br>Gerência de Ciência de Dados</h1>
+    <br>
+    <br>
+    <h1>Histórico de Revisão</h1>
     <form id="releaseForm">
-      <label for="name">Nome</label>
-      <input type="text" id="name" name="name" required>
+
+      <label for="release_date">Data</label>
+      <input type="date" id="date_revisao" name="date_revisao">
 
       <label for="version">Versão</label>
-      <input type="text" id="version" name="version">
+      <input type="text" id="versao" name="versao">
+      
+      <label for="name">Responsável</label>
+      <input type="text" id="responsavel" name="responsavel" required>
 
-      <label for="author">Autor</label>
-      <input type="text" id="author" name="author">
-
-      <label for="release_date">Data de Release</label>
-      <input type="date" id="release_date" name="release_date">
+      <label for="description">Descrição</label>
+      <textarea id="descricao" name="descricao" rows="4"></textarea>
 
       <label for="extraction_period">Período de Extração</label>
       <input type="text" id="extraction_period" name="extraction_period">
-
-      <label for="description">Descrição</label>
-      <textarea id="description" name="description" rows="4"></textarea>
 
       <button type="submit">Salvar</button>
     </form>
